@@ -5,7 +5,11 @@
 with pkgs;
 
 let
-  hsenv = haskellPackages.ghcWithPackages (p: with p; [
+  hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.0.x.nix") { inherit pkgs; };
+  newHaskellPkgs = haskellPackages.override { overrides = hsconfig; };
+  hsenv = newHaskellPkgs.ghcWithPackages (p: with p; [
+            fficxx
+            fficxx-runtime
             taggy-lens
             text
           ]);
