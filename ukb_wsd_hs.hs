@@ -6,6 +6,7 @@ module Main where
 import           Control.Applicative ((<$>))
 import           Foreign.C.String
 import           Foreign.C.Types
+import           Foreign.Ptr (Ptr(..),castPtr)
 import           Options.Applicative
 --
 import           HUKB.Binding
@@ -16,6 +17,8 @@ import qualified HUKB.Binding.Vector.TH       as TH
 $(TH.genVectorInstanceFor ''CFloat "float")
 
 foreign import ccall "set_global" c_set_global :: CString -> IO ()
+
+foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
 
 data ProgOption = ProgOption { kb_binfile :: FilePath
                              , dict_file :: FilePath
@@ -52,7 +55,8 @@ main = do
               sent <- newCSentence cstr_cid cstr_ctxt
               ranks <- newVector 
               calculate_kb_ppr sent ranks
-              -- ppr_csent   -> ukb_wsd
-              -- calculate_kb_ppr -> csentence top-level
-              -- disamb_csentence_kb -> csentence top-level
+              disamb_csentence_kb sent ranks
+              p_cout <- c_get_cout
+              let cout = Ostream (castPtr p_cout)
+              cSentenceprint_csent sent cout
               return ()

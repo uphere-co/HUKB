@@ -30,6 +30,12 @@ string =
   [ Constructor [ cstring "p" ] Nothing
   ]  
 
+ostream :: Class
+ostream =
+  Class cabal "ostream" [] mempty (Just "Ostream")
+  [ 
+  ]
+
 kb :: Class
 kb =
   Class cabal "Kb" [] mempty Nothing
@@ -57,13 +63,14 @@ csentence :: Class
 csentence =
   Class cabal "CSentence" [] mempty Nothing
   [ Constructor [ cstring "id" , cstring "ctx_str" ] Nothing
+  , NonVirtual (cppclassref_ ostream) "print_csent" [ cppclassref ostream "o" ] Nothing 
   ]
 
-classes = [string,kb,wdict_entries,wdict,csentence]
+classes = [string,ostream,kb,wdict_entries,wdict,csentence]
 
 toplevelfunctions =
   [ TopLevelFunction bool_ "calculate_kb_ppr" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing  
-
+  , TopLevelFunction bool_ "disamb_csentence_kb" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing  
   ]
 
 t_vector = TmplCls cabal "Vector" "std::vector" "t"
