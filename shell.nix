@@ -10,6 +10,7 @@ let
   hsenv = newHaskellPkgs.ghcWithPackages (p: with p; [
             fficxx
             fficxx-runtime
+            optparse-applicative
             taggy-lens
             text
           ]);
