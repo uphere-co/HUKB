@@ -46,13 +46,8 @@ templates = []
 headerMap = [ ("Kb", ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
             , ("string", ([NS "std"], [HdrName "string"]))
             ]
-{- 
-[ ( "EngineWrapper", ([NS "util"], [HdrName "enginewrapper.h"]))
-            , ( "json_t"         , ([NS "util"], [HdrName "utils/json.h", HdrName "enginewrapper.h" ]))
-            ]
--}
 
 main :: IO ()
 main = do 
   simpleBuilder "HUKB.Binding" headerMap (cabal,cabalattr,classes,toplevelfunctions,templates)
-    [ ] extraDep
+    [ "ukb" ] extraDep
