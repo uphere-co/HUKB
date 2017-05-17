@@ -50,21 +50,43 @@ wdict =
       [ cppclassref string "word", cppclassref string "pos" ] Nothing 
   ]
 
-
-classes = [string,kb,wdict_entries,wdict]
-
-toplevelfunctions = []
+vectorfloatref_ = TemplateAppRef t_vector "CFloat" "std::vector<float>"
 
 
-templates = []
+csentence :: Class
+csentence =
+  Class cabal "CSentence" [] mempty Nothing
+  [ Constructor [ cstring "id" , cstring "ctx_str" ] Nothing
+  ]
+
+classes = [string,kb,wdict_entries,wdict,csentence]
+
+toplevelfunctions =
+  [ TopLevelFunction bool_ "calculate_kb_ppr" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing  
+
+  ]
+
+t_vector = TmplCls cabal "Vector" "std::vector" "t"
+             [ TFunNew []
+             , TFun void_ "push_back" "push_back" [(TemplateParam "t","x")] Nothing
+             , TFun void_ "pop_back"  "pop_back"  []                        Nothing
+             , TFun (TemplateParam "t") "at" "at" [int "n"]                 Nothing
+             , TFun int_  "size"      "size"      []                        Nothing
+             , TFunDelete
+             ]
+
+
+    
+templates = [ (t_vector, HdrName "Vector.h") ]
 
 headerMap = [ ("Kb"           , ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
             , ("WDict_entries", ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
             , ("WDict"        , ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
+            , ("CSentence"    , ([NS "ukb", NS "std"], [HdrName "csentence.h"]))
             , ("string"       , ([NS "std"          ], [HdrName "string"   ]))
             ]
 
 main :: IO ()
 main = do 
   simpleBuilder "HUKB.Binding" headerMap (cabal,cabalattr,classes,toplevelfunctions,templates)
-    [ "ukb" ] extraDep
+    [ "ukb", "boost_random", "boost_filesystem", "boost_system" ] extraDep

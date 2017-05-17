@@ -21,6 +21,8 @@ stdenv.mkDerivation {
   name = "HUKB-dev";
   buildInputs = [ hsenv ukb boost ];
   shellHook = ''
+    export LD_LIBRARY_PATH=${boost}/lib:${ukb}/lib
+    export hsenv=${hsenv}
   '';
 }
 
