@@ -23,26 +23,6 @@ cabalattr =
     , cabalattr_extrafiles = []
     }
 
-{-
-engineWrapper :: Class
-engineWrapper =
-  Class cabal "EngineWrapper" [] mempty Nothing
-  [ Constructor [ cstring "configfile" ] Nothing
-  , Virtual (cppclass_ json_t) "register_documents" [ cstring "str", cppclass json_t "input" ] Nothing
-  , Virtual (cppclass_ json_t) "preprocess_query" [ cppclass json_t "input" ] Nothing    
-  , Virtual (cppclass_ json_t) "query" [ cppclass json_t "input" ] Nothing
-  , Virtual (cppclass_ json_t) "suggest" [ cppclass json_t "input" ] Nothing    
-  , Destructor (Just "deleteEngineWrapper")
-  ]
-
-json_t :: Class
-json_t =
-  Class cabal "json_t" []  mempty (Just "Json_t")
-  [ Constructor [ ] Nothing
-  , Static (cppclasscopy_ json_t) "parse" [cstring "txt"] Nothing 
-    
-  ]
--}
 
 string :: Class 
 string = 
@@ -53,33 +33,19 @@ string =
 kb :: Class
 kb =
   Class cabal "Kb" [] mempty Nothing
-  [ Static void_ "create_from_binfile" [ cppclass string "o" ] Nothing
+  [ Static void_ "create_from_binfile" [ cppclassref string "o" ] Nothing
   ]
 
-classes = [string,kb] -- [ engineWrapper, json_t ] 
+classes = [string,kb]
 
 toplevelfunctions = []
-{- [ TopLevelFunction cstring_ "serialize" [cppclass json_t "j"] Nothing
-                    , TopLevelFunction cstring_ "find" [cppclass json_t "j", cstring "k"] Nothing 
-                    ] -}
 
-{- 
-t_vector = TmplCls cabal "Vector" "std::vector" "t"
-             [ TFunNew [ ]
-             , TFun void_ "push_back" "push_back" [(TemplateParam "t","x")] Nothing
-             , TFun void_ "pop_back"  "pop_back"  []                        Nothing
-             , TFun (TemplateParam "t") "at" "at" [int "n"]                 Nothing
-             , TFun int_  "size"      "size"      []                        Nothing
-             , TFunDelete
-             ]
--}
 
 templates = []
-{- [ ( t_vector, HdrName "Vector.h" ) 
-            ] 
--}
 
-headerMap = []
+headerMap = [ ("Kb", ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
+            , ("string", ([NS "std"], [HdrName "string"]))
+            ]
 {- 
 [ ( "EngineWrapper", ([NS "util"], [HdrName "enginewrapper.h"]))
             , ( "json_t"         , ([NS "util"], [HdrName "utils/json.h", HdrName "enginewrapper.h" ]))

@@ -18,7 +18,7 @@ in
 
 stdenv.mkDerivation {
   name = "HUKB-dev";
-  buildInputs = [ hsenv ukb ];
+  buildInputs = [ hsenv ukb boost ];
   shellHook = ''
   '';
 }
