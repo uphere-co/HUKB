@@ -23,6 +23,15 @@ progOption = info pOptions (fullDesc <> progDesc "UKB word sense disambiguation"
 
 main = do
   opt <- execParser progOption
-  withCString (kb_binfile opt) $ \cstr -> do
-    str <- newCppString cstr
-    kbcreate_from_binfile str
+  withCString (kb_binfile opt) $ \cstr_bin -> do
+    withCString (dict_file opt) $ \cstr_dict -> do
+      withCString "kaka" $ \cstr_kaka -> do
+        withCString "" $ \cstr_null -> do
+          str_bin <- newCppString cstr_bin
+          str_dict <- newCppString cstr_dict
+          str_kaka <- newCppString cstr_kaka
+          str_null <- newCppString cstr_null
+          kbcreate_from_binfile str_bin
+          r <- wDictinstance
+          wDictget_entries r str_kaka str_null 
+          return ()

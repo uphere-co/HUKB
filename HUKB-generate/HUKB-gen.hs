@@ -36,15 +36,32 @@ kb =
   [ Static void_ "create_from_binfile" [ cppclassref string "o" ] Nothing
   ]
 
-classes = [string,kb]
+wdict_entries :: Class
+wdict_entries =
+  Class cabal "WDict_entries" [] mempty Nothing
+  [
+  ]
+
+wdict :: Class
+wdict =
+  Class cabal "WDict" [] mempty Nothing
+  [ Static     (cppclassref_ wdict)         "instance"    [ ] Nothing
+  , NonVirtual (cppclasscopy_ wdict_entries) "get_entries"
+      [ cppclassref string "word", cppclassref string "pos" ] Nothing 
+  ]
+
+
+classes = [string,kb,wdict_entries,wdict]
 
 toplevelfunctions = []
 
 
 templates = []
 
-headerMap = [ ("Kb", ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
-            , ("string", ([NS "std"], [HdrName "string"]))
+headerMap = [ ("Kb"           , ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
+            , ("WDict_entries", ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
+            , ("WDict"        , ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
+            , ("string"       , ([NS "std"          ], [HdrName "string"   ]))
             ]
 
 main :: IO ()
