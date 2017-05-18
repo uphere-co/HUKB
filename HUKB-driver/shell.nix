@@ -6,21 +6,10 @@ with pkgs;
 
 let
   ukb = import (uphere-nix-overlay + "/nix/cpp-modules/ukb.nix") { inherit stdenv fetchgit fetchurl boost; };
+  config = import ./config.nix { inherit pkgs uphere-nix-overlay ukb; };
 
-  hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.0.x.nix") { inherit pkgs; };
-  hsconfig2 =
-    let haskellPackages1 = haskellPackages.override { overrides = hsconfig; };
-        HUKBnix = import ../HUKB-generate/default.nix {
-          inherit stdenv;
-          haskellPackages = haskellPackages1;
-        };
-    in self: super: {
-         HUKB =  self.callPackage HUKBnix { inherit boost ukb; };  
-       }; 
-  newHaskellPkgs = haskellPackages.override {
-    overrides = self: super: hsconfig self super // hsconfig2 self super;
+  newHaskellPkgs = haskellPackages.override { overrides = config; };
 
-  };
   hsenv = newHaskellPkgs.ghcWithPackages (p: with p; [
             fficxx
             fficxx-runtime
