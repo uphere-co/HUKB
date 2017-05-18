@@ -4,21 +4,10 @@
 module Main where
 
 import           Control.Applicative ((<$>))
-import           Foreign.C.String
-import           Foreign.C.Types
-import           Foreign.Ptr (Ptr(..),castPtr)
 import           Options.Applicative
 --
-import           HUKB.Binding
-import           HUKB.Binding.Vector.Template 
-import qualified HUKB.Binding.Vector.TH       as TH
+import           HUKB.PPR
 
-
-$(TH.genVectorInstanceFor ''CFloat "float")
-
-foreign import ccall "set_global" c_set_global :: CString -> IO ()
-
-foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
 
 data ProgOption = ProgOption { kb_binfile :: FilePath
                              , dict_file :: FilePath
@@ -36,27 +25,5 @@ progOption = info pOptions (fullDesc <> progDesc "UKB word sense disambiguation"
 
 
 main = do
-  opt <- execParser progOption
-  withCString (kb_binfile opt) $ \cstr_bin -> do
-    withCString (dict_file opt) $ \cstr_dict -> do
-      withCString "kaka" $ \cstr_kaka -> do
-        withCString "" $ \cstr_null -> do
-          withCString "ctx_01" $ \cstr_cid -> do
-            withCString "man#n#w1#1 kill#v#w2#1 cat#n#w3#1 hammer#n#w4#1" $ \cstr_ctxt -> do
-              str_bin <- newCppString cstr_bin
-              -- str_dict <- newCppString cstr_dict
-              str_kaka <- newCppString cstr_kaka
-              str_null <- newCppString cstr_null
-              -- str_cid <- newCppString cstr_cid
-              -- str_ctxt <- newCppString cstr_ctxt
-              kbcreate_from_binfile str_bin
-              c_set_global cstr_dict
-              wDictinstance >>= \r -> wDictget_entries r str_kaka str_null
-              sent <- newCSentence cstr_cid cstr_ctxt
-              ranks <- newVector 
-              calculate_kb_ppr sent ranks
-              disamb_csentence_kb sent ranks
-              p_cout <- c_get_cout
-              let cout = Ostream (castPtr p_cout)
-              cSentenceprint_csent sent cout
-              return ()
+  opt <- execParser progOption 
+  ppr (kb_binfile opt) (dict_file opt) "ctx_01" "man#n#w1#1 kill#v#w2#1 cat#n#w3#1 hammer#n#w4#1"
