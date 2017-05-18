@@ -6,9 +6,15 @@ with pkgs;
 
 let
   ukb = import (uphere-nix-overlay + "/nix/cpp-modules/ukb.nix") { inherit stdenv fetchgit fetchurl boost; };
-  config = import ./config.nix { inherit pkgs uphere-nix-overlay ukb; };
+  hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.0.x.nix") {
+    inherit pkgs;
+  };
+  
+  newconfig = import ./config.nix { inherit pkgs uphere-nix-overlay ukb; };
 
-  newHaskellPkgs = haskellPackages.override { overrides = config; };
+  newHaskellPkgs = haskellPackages.override {
+    overrides = self: super: hsconfig self super // newconfig self super;
+  };
 
   hsenv = newHaskellPkgs.ghcWithPackages (p: with p; [
             fficxx
