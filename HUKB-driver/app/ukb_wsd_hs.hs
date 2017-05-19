@@ -27,4 +27,5 @@ progOption = info pOptions (fullDesc <> progDesc "UKB word sense disambiguation"
 
 main = do
   opt <- execParser progOption 
-  ppr (kb_binfile opt) (dict_file opt) "ctx_01" "man#n#w1#1 kill#v#w2#1 cat#n#w3#1 hammer#n#w4#1"
+  result <- ppr (kb_binfile opt) (dict_file opt) "ctx_01" "man#n#w1#1 kill#v#w2#1 cat#n#w3#1 hammer#n#w4#1"
+  print result
