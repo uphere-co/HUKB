@@ -3,9 +3,10 @@
 
 module HUKB.PPR where
 
+import           Data.ByteString.Char8        as B  (packCString)
 import           Foreign.C.String
 import           Foreign.C.Types
-import           Foreign.Ptr (Ptr,castPtr)
+import           Foreign.Ptr                        (Ptr,castPtr)
 --
 import           HUKB.Binding
 import           HUKB.Binding.Vector.Template 
@@ -47,9 +48,9 @@ ppr binfile dictfile cid sent = do
               pvw <- c_get_vec_cword_from_csentence (castPtr psent)
               let v = Vector (castPtr pvw) :: Vector CWord
               print =<< size v
-              c0 <- at v 0
-              s <- cWordword c0
-              -- cstr <- stringc_str s
-              -- bstr <- packCString cstr
-              -- print bstr
+              cs <- mapM (at v) [0,1,2,3]
+              ss <- mapM cWordword cs
+              cstrs <- mapM cppStringc_str ss
+              bstrs <- mapM packCString cstrs
+              mapM_ print bstrs
               return ()

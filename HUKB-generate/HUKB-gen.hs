@@ -28,7 +28,7 @@ string :: Class
 string = 
   Class cabal "string" [] mempty  (Just "CppString")
   [ Constructor [ cstring "p" ] Nothing
-  -- , NonVirtual cstring_ "c_str" [] Nothing 
+  , NonVirtual cstring_ "c_str" [] Nothing 
   ]  
 
 ostream :: Class
