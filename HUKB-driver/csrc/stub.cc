@@ -2,9 +2,12 @@
 #include <vector>
 #include "Vector.h"
 
-// #include "STLType.h"
+#include <csentence.h>
+#include "HUKBType.h"
 
+
+using namespace ukb;
 
 Vector_instance_s(float)
-
+Vector_instance(CWord)
 

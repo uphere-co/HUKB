@@ -14,10 +14,13 @@ import qualified HUKB.Binding.Vector.TH       as TH
 
 
 $(TH.genVectorInstanceFor ''CFloat "float")
+$(TH.genVectorInstanceFor ''CWord "CWord")
 
 foreign import ccall "set_global" c_set_global :: CString -> IO ()
 
 foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
+
+foreign import ccall "get_vec_cword_from_csentence" c_get_vec_cword_from_csentence :: Ptr () -> IO (Ptr ())
 
 
 ppr :: FilePath -> FilePath -> String -> String -> IO ()
@@ -34,11 +37,19 @@ ppr binfile dictfile cid sent = do
               kbcreate_from_binfile str_bin
               c_set_global cstr_dict
               wDictinstance >>= \r -> wDictget_entries r str_kaka str_null
-              sent <- newCSentence cstr_cid cstr_ctxt
+              sent@(CSentence psent) <- newCSentence cstr_cid cstr_ctxt
               ranks <- newVector 
               calculate_kb_ppr sent ranks
               disamb_csentence_kb sent ranks
               p_cout <- c_get_cout
               let cout = Ostream (castPtr p_cout)
               cSentenceprint_csent sent cout
+              pvw <- c_get_vec_cword_from_csentence (castPtr psent)
+              let v = Vector (castPtr pvw) :: Vector CWord
+              print =<< size v
+              c0 <- at v 0
+              s <- cWordword c0
+              -- cstr <- stringc_str s
+              -- bstr <- packCString cstr
+              -- print bstr
               return ()
