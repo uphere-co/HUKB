@@ -63,6 +63,9 @@ cword :: Class
 cword =
   Class cabal "CWord" [] mempty Nothing
   [ NonVirtual (cppclasscopy_ string) "word" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "wpos" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "id" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "syn" [int "i"] Nothing
   ]
 
 csentence :: Class
@@ -70,6 +73,7 @@ csentence =
   Class cabal "CSentence" [] mempty Nothing
   [ Constructor [ cstring "id" , cstring "ctx_str" ] Nothing
   , NonVirtual (cppclassref_ ostream) "print_csent" [ cppclassref ostream "o" ] Nothing
+  , NonVirtual (cppclasscopy_ string) "id" [] Nothing        
   -- , NonVirtual (cppclassref_ csentenceConstIterator) "ubegin" [] Nothing
   -- , NonVirtual (cppclassref_ csentenceConstIterator) "uend" [] Nothing
   ]

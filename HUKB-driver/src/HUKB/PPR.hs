@@ -3,6 +3,7 @@
 
 module HUKB.PPR where
 
+import           Control.Monad                      ((<=<))
 import           Data.ByteString.Char8        as B  (packCString)
 import           Foreign.C.String
 import           Foreign.C.Types
@@ -24,7 +25,8 @@ foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
 foreign import ccall "get_vec_cword_from_csentence" c_get_vec_cword_from_csentence :: Ptr () -> IO (Ptr ())
 
 
-ppr :: FilePath -> FilePath -> String -> String -> IO ()
+ppr :: FilePath -> FilePath -> String -> String
+    -> IO (B.ByteString,(B.ByteString,B.ByteString,B.ByteString,B.ByteString))
 ppr binfile dictfile cid sent = do
   withCString binfile $ \cstr_bin -> do
     withCString dictfile $ \cstr_dict -> do
@@ -47,10 +49,15 @@ ppr binfile dictfile cid sent = do
               cSentenceprint_csent sent cout
               pvw <- c_get_vec_cword_from_csentence (castPtr psent)
               let v = Vector (castPtr pvw) :: Vector CWord
-              print =<< size v
-              cs <- mapM (at v) [0,1,2,3]
-              ss <- mapM cWordword cs
-              cstrs <- mapM cppStringc_str ss
-              bstrs <- mapM packCString cstrs
-              mapM_ print bstrs
-              return ()
+              n <- size v
+              let getbstr = packCString <=< cppStringc_str
+              sid <- (getbstr <=< cSentenceid) sent
+              
+              ws <- mapM (at v) [0..n-1]
+              quads <- mapM (\x -> (,,,) <$> (getbstr =<< cWordid x)
+                                         <*> (getbstr =<< cWordwpos x)
+                                         <*> (getbstr =<< cWordsyn x 0)
+                                         <*> (getbstr =<< cWordword x)) ws
+              print (sid,quads)
+              return (sid,quads)
+
