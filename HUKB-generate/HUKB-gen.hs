@@ -28,6 +28,7 @@ string :: Class
 string = 
   Class cabal "string" [] mempty  (Just "CppString")
   [ Constructor [ cstring "p" ] Nothing
+  , NonVirtual cstring_ "c_str" [] Nothing 
   ]  
 
 ostream :: Class
@@ -58,15 +59,36 @@ wdict =
 
 vectorfloatref_ = TemplateAppRef t_vector "CFloat" "std::vector<float>"
 
+cword :: Class
+cword =
+  Class cabal "CWord" [] mempty Nothing
+  [ NonVirtual (cppclasscopy_ string) "word" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "wpos" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "id" [] Nothing
+  , NonVirtual (cppclasscopy_ string) "syn" [int "i"] Nothing
+  ]
 
 csentence :: Class
 csentence =
   Class cabal "CSentence" [] mempty Nothing
   [ Constructor [ cstring "id" , cstring "ctx_str" ] Nothing
-  , NonVirtual (cppclassref_ ostream) "print_csent" [ cppclassref ostream "o" ] Nothing 
+  , NonVirtual (cppclassref_ ostream) "print_csent" [ cppclassref ostream "o" ] Nothing
+  , NonVirtual (cppclasscopy_ string) "id" [] Nothing        
+  -- , NonVirtual (cppclassref_ csentenceConstIterator) "ubegin" [] Nothing
+  -- , NonVirtual (cppclassref_ csentenceConstIterator) "uend" [] Nothing
   ]
 
-classes = [string,ostream,kb,wdict_entries,wdict,csentence]
+{- 
+csentenceConstIterator :: Class
+csentenceConstIterator =
+  Class cabal "CSentence::const_iterator" [] mempty (Just "CSentenceConstIterator")
+  [
+  ]
+-}
+
+classes = [ string,ostream,kb,wdict_entries,wdict,csentence,cword
+          -- , csentenceConstIterator
+          ]
 
 toplevelfunctions =
   [ TopLevelFunction bool_ "calculate_kb_ppr" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing  
@@ -90,6 +112,7 @@ headerMap = [ ("Kb"           , ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
             , ("WDict_entries", ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
             , ("WDict"        , ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
             , ("CSentence"    , ([NS "ukb", NS "std"], [HdrName "csentence.h"]))
+            , ("CWord"        , ([NS "ukb", NS "std"], [HdrName "csentence.h", HdrName "string"]))      
             , ("string"       , ([NS "std"          ], [HdrName "string"   ]))
             ]
 

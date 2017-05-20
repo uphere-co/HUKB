@@ -22,7 +22,7 @@ let
             optparse-applicative
             taggy-lens
             text
-            HUKB
+            #HUKB
           ]);
 in
 

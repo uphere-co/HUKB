@@ -3,9 +3,12 @@
 
 module HUKB.PPR where
 
+import           Control.Monad                      ((<=<))
+import           Data.ByteString.Char8              (ByteString) 
+import qualified Data.ByteString.Char8        as B  (packCString)
 import           Foreign.C.String
 import           Foreign.C.Types
-import           Foreign.Ptr (Ptr,castPtr)
+import           Foreign.Ptr                        (Ptr,castPtr)
 --
 import           HUKB.Binding
 import           HUKB.Binding.Vector.Template 
@@ -14,13 +17,17 @@ import qualified HUKB.Binding.Vector.TH       as TH
 
 
 $(TH.genVectorInstanceFor ''CFloat "float")
+$(TH.genVectorInstanceFor ''CWord "CWord")
 
 foreign import ccall "set_global" c_set_global :: CString -> IO ()
 
 foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
 
+foreign import ccall "get_vec_cword_from_csentence" c_get_vec_cword_from_csentence :: Ptr () -> IO (Ptr ())
 
-ppr :: FilePath -> FilePath -> String -> String -> IO ()
+
+ppr :: FilePath -> FilePath -> String -> String
+    -> IO (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
 ppr binfile dictfile cid sent = do
   withCString binfile $ \cstr_bin -> do
     withCString dictfile $ \cstr_dict -> do
@@ -34,11 +41,23 @@ ppr binfile dictfile cid sent = do
               kbcreate_from_binfile str_bin
               c_set_global cstr_dict
               wDictinstance >>= \r -> wDictget_entries r str_kaka str_null
-              sent <- newCSentence cstr_cid cstr_ctxt
+              sent@(CSentence psent) <- newCSentence cstr_cid cstr_ctxt
               ranks <- newVector 
               calculate_kb_ppr sent ranks
               disamb_csentence_kb sent ranks
               p_cout <- c_get_cout
               let cout = Ostream (castPtr p_cout)
-              cSentenceprint_csent sent cout
-              return ()
+              -- cSentenceprint_csent sent cout
+              pvw <- c_get_vec_cword_from_csentence (castPtr psent)
+              let v = Vector (castPtr pvw) :: Vector CWord
+              n <- size v
+              let getbstr = B.packCString <=< cppStringc_str
+              sid <- (getbstr <=< cSentenceid) sent
+              
+              ws <- mapM (at v) [0..n-1]
+              quads <- mapM (\x -> (,,,) <$> (getbstr =<< cWordid x)
+                                         <*> (getbstr =<< cWordwpos x)
+                                         <*> (getbstr =<< cWordsyn x 0)
+                                         <*> (getbstr =<< cWordword x)) ws
+              return (sid,quads)
+
