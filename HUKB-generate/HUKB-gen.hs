@@ -10,7 +10,10 @@ import FFICXX.Generate.Type.PackageInterface
 
 cabal = Cabal { cabal_pkgname = "HUKB" 
               , cabal_cheaderprefix = "HUKB"
-              , cabal_moduleprefix = "HUKB.Binding" }
+              , cabal_moduleprefix = "HUKB.Binding"
+              , cabal_additional_c_incs = []
+              , cabal_additional_c_srcs = []
+              }
 
 extraDep = []
 
