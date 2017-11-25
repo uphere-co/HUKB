@@ -1,15 +1,15 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module HUKB.Type where
 
-import Control.Lens
+import           Control.Lens
+import           Foreign.C.String
+--
+import           HUKB.Binding
 
-data UKBDB = UKBDB { _ukbdb_c_bin :: CString
-                   , _ukddb_cpp_bin :: CppSting
-                   , _ukbdb_c_dict :: CString
-                   , _ukbdb_cpp_dict :: CppString
+
+data UKBDB = UKBDB { _ukddb_bin :: CppString
+                   , _ukbdb_dict :: CString
                    }
 
 makeLenses ''UKBDB
-
-createUKBDB :: (FilePath,FilePath) -> IO UKBDB
-createUKBDB =
-  newCString 

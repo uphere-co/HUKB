@@ -27,11 +27,13 @@ Library
                         csrc/globalvar.cc
   
   exposed-modules:
-                     HUKB.PPR
+                       HUKB.PPR
+                       HUKB.Type
                   
   build-depends:       base,
                        --
                        bytestring,
+                       lens,
                        text,
                        HUKB
 
