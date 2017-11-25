@@ -1,5 +1,7 @@
 { pkgs ? import <nixpkgs> {}
 , uphere-nix-overlay ? <uphere-nix-overlay>
+, HWordNet           ? <HWordNet>
+, nlp-types          ? <nlp-types>
 }:
 
 with pkgs;
@@ -9,11 +11,17 @@ let
   hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.0.x.nix") {
     inherit pkgs;
   };
-  
+
   newconfig = import ./config.nix { inherit pkgs uphere-nix-overlay ukb; };
 
+  hsconfig2 =
+    self: super: {
+      "HWordNet"  = self.callPackage (import HWordNet)  {};
+      "nlp-types" = self.callPackage (import nlp-types) {};
+    };
+
   newHaskellPkgs = haskellPackages.override {
-    overrides = self: super: hsconfig self super // newconfig self super;
+    overrides = self: super: hsconfig self super // hsconfig2 self super // newconfig self super;
   };
 
   hsenv = newHaskellPkgs.ghcWithPackages (p: with p; [
@@ -22,7 +30,8 @@ let
             optparse-applicative
             taggy-lens
             text
-            HUKB
+            p.HUKB
+            p.HWordNet
           ]);
 in
 

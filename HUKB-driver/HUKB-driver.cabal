@@ -35,6 +35,8 @@ Library
                        bytestring,
                        lens,
                        text,
+                       HWordNet,
+                       --
                        HUKB
 
                      

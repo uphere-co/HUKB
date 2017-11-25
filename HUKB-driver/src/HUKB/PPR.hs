@@ -4,17 +4,22 @@
 
 module HUKB.PPR where
 
+import           Control.Lens                       ((^.),(^..),to)
 import           Control.Monad                      ((<=<))
-import           Data.ByteString.Char8              (ByteString) 
+import           Data.ByteString.Char8              (ByteString)
 import qualified Data.ByteString.Char8        as B  (packCString,useAsCString)
+import           Data.Monoid                        ((<>))
 import           Data.Text                          (Text)
+import qualified Data.Text                    as T
 import qualified Data.Text.Encoding           as TE
 import           Foreign.C.String
 import           Foreign.C.Types
 import           Foreign.Ptr                        (Ptr,castPtr)
 --
+import           WordNet.Type.POS
+--
 import           HUKB.Binding
-import           HUKB.Binding.Vector.Template 
+import           HUKB.Binding.Vector.Template
 import qualified HUKB.Binding.Vector.TH       as TH
 --
 import           HUKB.Type
@@ -29,6 +34,15 @@ foreign import ccall "get_cout" c_get_cout :: IO (Ptr ())
 
 foreign import ccall "get_vec_cword_from_csentence" c_get_vec_cword_from_csentence :: Ptr () -> IO (Ptr ())
 
+pos2Text POS_N = "n"
+pos2Text POS_V = "v"
+pos2Text POS_A = "a"
+pos2Text POS_R = "r"
+
+convertContextWord2Text cw = cw^.cw_word <> "#" <>
+                             cw^.cw_pos.to pos2Text <> "#" <>
+                             cw^.cw_label <> "#" <>
+                             cw^.cw_n.to show.to T.pack
 
 
 createUKBDB :: (FilePath,FilePath) -> IO () -- UKBDB
@@ -42,8 +56,10 @@ createUKBDB (binfile,dictfile) =
 --
 -- | Be careful. I am using global variables here.
 --
-ppr :: (Text,Text) -> IO (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
-ppr (cid,ctxt) =
+ppr :: Context -> IO (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
+ppr c = do
+  let cid = c^.context_name
+      ctxt = T.intercalate " " (c^..context_words.traverse.to convertContextWord2Text)
   withCString "kaka" $ \cstr_kaka -> do
     withCString "" $ \cstr_null -> do
       str_kaka <- newCppString cstr_kaka
@@ -54,7 +70,7 @@ ppr (cid,ctxt) =
         B.useAsCString bstr_ctxt $ \cstr_ctxt -> do
           wDictinstance >>= \r -> wDictget_entries r str_kaka str_null
           sent@(CSentence psent) <- newCSentence cstr_cid cstr_ctxt
-          ranks <- newVector 
+          ranks <- newVector
           calculate_kb_ppr sent ranks
           disamb_csentence_kb sent ranks
           p_cout <- c_get_cout
@@ -74,5 +90,3 @@ ppr (cid,ctxt) =
           delete str_kaka
           delete str_null
           return (sid,quads)
-
-
