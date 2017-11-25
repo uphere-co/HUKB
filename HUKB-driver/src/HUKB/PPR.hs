@@ -12,6 +12,7 @@ import           Data.Monoid                        ((<>))
 import           Data.Text                          (Text)
 import qualified Data.Text                    as T
 import qualified Data.Text.Encoding           as TE
+import qualified Data.Text.Encoding.Error     as TE
 import           Foreign.C.String
 import           Foreign.C.Types
 import           Foreign.Ptr                        (Ptr,castPtr)
@@ -79,14 +80,14 @@ ppr c = do
           pvw <- c_get_vec_cword_from_csentence (castPtr psent)
           let v = Vector (castPtr pvw) :: Vector CWord
           n <- size v
-          let getbstr = B.packCString <=< cppStringc_str
-          sid <- (getbstr <=< cSentenceid) sent
+          let gettext = fmap (TE.decodeUtf8With TE.lenientDecode) . B.packCString <=< cppStringc_str
+          sid <- (gettext <=< cSentenceid) sent
 
           ws <- mapM (at v) [0..n-1]
-          quads <- mapM (\x -> UKBRW <$> (getbstr =<< cWordid x)
-                                     <*> (getbstr =<< cWordwpos x)
-                                     <*> (getbstr =<< cWordsyn x 0)
-                                     <*> (getbstr =<< cWordword x)) ws
+          quads <- mapM (\x -> UKBRW <$> (gettext =<< cWordid x)
+                                     <*> (gettext =<< cWordwpos x)
+                                     <*> (gettext =<< cWordsyn x 0)
+                                     <*> (gettext =<< cWordword x)) ws
           delete str_kaka
           delete str_null
           return (UKBResult sid quads)

@@ -32,10 +32,10 @@ data Context = Context { _context_name :: Text
 makeLenses ''Context
 
 
-data UKBResultWord = UKBRW { _ukbrw_id :: ByteString
-                           , _ukbrw_wpos :: ByteString
-                           , _ukbrw_syn :: ByteString
-                           , _ukbrw_word :: ByteString
+data UKBResultWord = UKBRW { _ukbrw_id   :: Text
+                           , _ukbrw_wpos :: Text
+                           , _ukbrw_syn  :: Text
+                           , _ukbrw_word :: Text
                            }
                    deriving Show
 
@@ -43,7 +43,7 @@ data UKBResultWord = UKBRW { _ukbrw_id :: ByteString
 
 makeLenses ''UKBResultWord
 
-data UKBResult = UKBResult { _ukbresult_sentid :: ByteString
+data UKBResult = UKBResult { _ukbresult_sentid :: Text
                            , _ukbresult_words :: [UKBResultWord]
                            }
                  deriving Show
