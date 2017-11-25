@@ -56,7 +56,7 @@ createUKBDB (binfile,dictfile) =
 --
 -- | Be careful. I am using global variables here.
 --
-ppr :: Context -> IO (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
+ppr :: Context -> IO UKBResult --- (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
 ppr c = do
   let cid = c^.context_name
       ctxt = T.intercalate " " (c^..context_words.traverse.to convertContextWord2Text)
@@ -83,10 +83,10 @@ ppr c = do
           sid <- (getbstr <=< cSentenceid) sent
 
           ws <- mapM (at v) [0..n-1]
-          quads <- mapM (\x -> (,,,) <$> (getbstr =<< cWordid x)
+          quads <- mapM (\x -> UKBRW <$> (getbstr =<< cWordid x)
                                      <*> (getbstr =<< cWordwpos x)
                                      <*> (getbstr =<< cWordsyn x 0)
                                      <*> (getbstr =<< cWordword x)) ws
           delete str_kaka
           delete str_null
-          return (sid,quads)
+          return (UKBResult sid quads)

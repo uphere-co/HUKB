@@ -2,8 +2,9 @@
 
 module HUKB.Type where
 
-import           Control.Lens     (makeLenses)
-import           Data.Text        (Text)
+import           Control.Lens          (makeLenses)
+import           Data.ByteString.Char8 (ByteString)
+import           Data.Text             (Text)
 import           Foreign.C.String
 --
 import           WordNet.Type.POS
@@ -29,3 +30,22 @@ data Context = Context { _context_name :: Text
                        , _context_words :: [ContextWord] }
 
 makeLenses ''Context
+
+
+data UKBResultWord = UKBRW { _ukbrw_id :: ByteString
+                           , _ukbrw_wpos :: ByteString
+                           , _ukbrw_syn :: ByteString
+                           , _ukbrw_word :: ByteString
+                           }
+                   deriving Show
+
+
+
+makeLenses ''UKBResultWord
+
+data UKBResult = UKBResult { _ukbresult_sentid :: ByteString
+                           , _ukbresult_words :: [UKBResultWord]
+                           }
+                 deriving Show
+
+makeLenses ''UKBResult

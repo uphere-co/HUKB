@@ -48,6 +48,8 @@ executable ukb_wsd_hs
   
   build-depends:       base >=4.9 && <4.10,
                        optparse-applicative,
+                       text,
+                       HWordNet,
                        -- HUKB,
                        HUKB-driver
   hs-source-dirs:      app
