@@ -33,7 +33,7 @@ cwords = zipWith f [1..] [ ("Britain",POS_N), ("cut",POS_V), ("stamp",POS_N), ("
                          , ("buyer",POS_N), ("bid",POS_N), ("help",POS_V), ("people",POS_N), ("struggle",POS_V), ("get",POS_V)
                          , ("property",POS_N), ("ladder",POS_N), ("finance",POS_N), ("minister",POS_N), ("Philip",POS_N)
                          , ("Hammond",POS_N), ("say",POS_V), ("Wednesday",POS_N) ]
-  where f i (w,p) = CtxtWord w p (T.pack ("w"++show i)) 1
+  where f i (w,p) = CtxtWord w p i 1
 {-
 ("ctx_01"
                 ,"Britain#n#w1#1 cut#v#w2#1 stamp#n#w3#1 duty#n#w4#1 property#n#w5#1 tax#n#w6#1 buyer#n#w7#1 bid#n#w8#1 help#v#w9#1 people#n#w10#1 struggle#v#w11#1 get#v#w12#1 property#n#w13#1 ladder#n#w14#1 finance#n#w15#1 minister#n#w16#1 Philip#n#w17#1 Hammond#n#w18#1 say#v#w19#1 Wednesday#n#w20#1")
@@ -42,7 +42,7 @@ cwords = zipWith f [1..] [ ("Britain",POS_N), ("cut",POS_V), ("stamp",POS_N), ("
 main = do
   opt <- execParser progOption
   createUKBDB (kb_binfile opt,dict_file opt)
-  let ctxt = Context "ctx_01" cwords
+  let ctxt = Context "1" cwords
 
 
   result <- ppr ctxt

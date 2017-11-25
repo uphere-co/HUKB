@@ -4,15 +4,18 @@
 
 module HUKB.PPR where
 
+import           Control.Error.Safe                 (rightMay)
 import           Control.Lens                       ((^.),(^..),to)
 import           Control.Monad                      ((<=<))
 import           Data.ByteString.Char8              (ByteString)
 import qualified Data.ByteString.Char8        as B  (packCString,useAsCString)
+import           Data.Maybe                         (catMaybes)
 import           Data.Monoid                        ((<>))
 import           Data.Text                          (Text)
 import qualified Data.Text                    as T
 import qualified Data.Text.Encoding           as TE
 import qualified Data.Text.Encoding.Error     as TE
+import           Data.Text.Read                     (decimal)
 import           Foreign.C.String
 import           Foreign.C.Types
 import           Foreign.Ptr                        (Ptr,castPtr)
@@ -42,7 +45,7 @@ pos2Text POS_R = "r"
 
 convertContextWord2Text cw = cw^.cw_word <> "#" <>
                              cw^.cw_pos.to pos2Text <> "#" <>
-                             cw^.cw_label <> "#" <>
+                             cw^.cw_label.to show.to T.pack <> "#" <>
                              cw^.cw_n.to show.to T.pack
 
 
@@ -57,7 +60,7 @@ createUKBDB (binfile,dictfile) =
 --
 -- | Be careful. I am using global variables here.
 --
-ppr :: Context -> IO UKBResult --- (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
+ppr :: Context -> IO (Maybe UKBResult) --- (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
 ppr c = do
   let cid = c^.context_name
       ctxt = T.intercalate " " (c^..context_words.traverse.to convertContextWord2Text)
@@ -81,13 +84,16 @@ ppr c = do
           let v = Vector (castPtr pvw) :: Vector CWord
           n <- size v
           let gettext = fmap (TE.decodeUtf8With TE.lenientDecode) . B.packCString <=< cppStringc_str
-          sid <- (gettext <=< cSentenceid) sent
+              getint  = fmap (fmap fst . rightMay . decimal) . gettext
+          msid <- (getint <=< cSentenceid) sent
 
           ws <- mapM (at v) [0..n-1]
-          quads <- mapM (\x -> UKBRW <$> (gettext =<< cWordid x)
-                                     <*> (gettext =<< cWordwpos x)
-                                     <*> (gettext =<< cWordsyn x 0)
-                                     <*> (gettext =<< cWordword x)) ws
+          quads <- fmap catMaybes . flip mapM ws $ \x -> do mi <- getint =<< cWordid x
+                                                            case mi of
+                                                              Nothing -> return Nothing
+                                                              Just i -> fmap Just (UKBRW i <$> (gettext =<< cWordwpos x)
+                                                                                           <*> (gettext =<< cWordsyn x 0)
+                                                                                           <*> (gettext =<< cWordword x))
           delete str_kaka
           delete str_null
-          return (UKBResult sid quads)
+          return (fmap (flip UKBResult quads) msid)

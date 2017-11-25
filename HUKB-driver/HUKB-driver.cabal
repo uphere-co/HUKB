@@ -33,6 +33,7 @@ Library
   build-depends:       base,
                        --
                        bytestring,
+                       errors,
                        lens,
                        text,
                        HWordNet,

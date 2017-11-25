@@ -20,7 +20,7 @@ makeLenses ''UKBDB
 
 data ContextWord = CtxtWord { _cw_word  :: Text
                             , _cw_pos   :: POS
-                            , _cw_label :: Text
+                            , _cw_label :: Int
                             , _cw_n     :: Int }
 
 makeLenses ''ContextWord
@@ -32,7 +32,7 @@ data Context = Context { _context_name :: Text
 makeLenses ''Context
 
 
-data UKBResultWord = UKBRW { _ukbrw_id   :: Text
+data UKBResultWord = UKBRW { _ukbrw_id   :: Int
                            , _ukbrw_wpos :: Text
                            , _ukbrw_syn  :: Text
                            , _ukbrw_word :: Text
@@ -43,7 +43,7 @@ data UKBResultWord = UKBRW { _ukbrw_id   :: Text
 
 makeLenses ''UKBResultWord
 
-data UKBResult = UKBResult { _ukbresult_sentid :: Text
+data UKBResult = UKBResult { _ukbresult_sentid :: Int
                            , _ukbresult_words :: [UKBResultWord]
                            }
                  deriving Show
