@@ -45,7 +45,7 @@ data UKBResultWord = UKBRW { _ukbrw_id   :: Int
 
 makeLenses ''UKBResultWord
 
-data UKBResult = UKBResult { _ukbresult_sentid :: Int
+data UKBResult = UKBResult { _ukbresult_sentid :: Text
                            , _ukbresult_words :: [UKBResultWord]
                            }
                  deriving Show

@@ -60,7 +60,7 @@ createUKBDB (binfile,dictfile) =
 --
 -- | Be careful. I am using global variables here.
 --
-ppr :: Context -> IO (Maybe UKBResult) --- (ByteString,[(ByteString,ByteString,ByteString,ByteString)])
+ppr :: Context -> IO UKBResult
 ppr c = do
   let cid = c^.context_name
       ctxt = T.intercalate " " (c^..context_words.traverse.to convertContextWord2Text)
@@ -85,7 +85,7 @@ ppr c = do
           n <- size v
           let gettext = fmap (TE.decodeUtf8With TE.lenientDecode) . B.packCString <=< cppStringc_str
               getint  = fmap (fmap fst . rightMay . decimal) . gettext
-          msid <- (getint <=< cSentenceid) sent
+          sid <- (gettext <=< cSentenceid) sent
 
           ws <- mapM (at v) [0..n-1]
           quads <- fmap catMaybes . flip mapM ws $ \x -> do mi <- getint =<< cWordid x
@@ -96,4 +96,4 @@ ppr c = do
                                                                                            <*> (gettext =<< cWordword x))
           delete str_kaka
           delete str_null
-          return (fmap (flip UKBResult quads) msid)
+          return (UKBResult sid quads)
