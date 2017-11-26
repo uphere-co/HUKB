@@ -34,10 +34,10 @@ data Context = Context { _context_name :: Text
 makeLenses ''Context
 
 
-data UKBResultWord = UKBRW { _ukbrw_id   :: Int
-                           , _ukbrw_wpos :: Text
-                           , _ukbrw_syn  :: Text
-                           , _ukbrw_word :: Text
+data UKBResultWord s = UKBRW { _ukbrw_id   :: Int
+                             , _ukbrw_wpos :: Text
+                             , _ukbrw_syn  :: s
+                             , _ukbrw_word :: Text
                            }
                    deriving Show
 
@@ -45,9 +45,9 @@ data UKBResultWord = UKBRW { _ukbrw_id   :: Int
 
 makeLenses ''UKBResultWord
 
-data UKBResult = UKBResult { _ukbresult_sentid :: Text
-                           , _ukbresult_words :: [UKBResultWord]
-                           }
+data UKBResult s = UKBResult { _ukbresult_sentid :: Text
+                             , _ukbresult_words :: [UKBResultWord s]
+                             }
                  deriving Show
 
 makeLenses ''UKBResult

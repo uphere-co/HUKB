@@ -60,7 +60,7 @@ createUKBDB (binfile,dictfile) =
 --
 -- | Be careful. I am using global variables here.
 --
-ppr :: Context -> IO UKBResult
+ppr :: Context -> IO (UKBResult Text)
 ppr c = do
   let cid = c^.context_name
       ctxt = T.intercalate " " (c^..context_words.traverse.to convertContextWord2Text)
