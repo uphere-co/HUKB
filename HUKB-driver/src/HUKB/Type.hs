@@ -22,12 +22,14 @@ data ContextWord = CtxtWord { _cw_word  :: Text
                             , _cw_pos   :: POS
                             , _cw_label :: Int
                             , _cw_n     :: Int }
+                 deriving (Show)
 
 makeLenses ''ContextWord
 
 
 data Context = Context { _context_name :: Text
                        , _context_words :: [ContextWord] }
+               deriving (Show)
 
 makeLenses ''Context
 
