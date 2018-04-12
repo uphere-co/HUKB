@@ -47,7 +47,7 @@ executable ukb_wsd_hs
   -- other-extensions:
   -- cc-options:           -std=c++14
   
-  build-depends:       base >=4.9 && <4.10,
+  build-depends:       base >=4.9,
                        optparse-applicative,
                        text,
                        HWordNet,
