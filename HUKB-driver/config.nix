@@ -7,7 +7,7 @@
 with pkgs;
 
 let
-  hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.0.x.nix") { inherit pkgs haskellLib; };
+  hsconfig = import (uphere-nix-overlay + "/nix/haskell-modules/configuration-ghc-8.2.x.nix") { inherit pkgs haskellLib; };
   haskellPackages1 = haskellPackages.override { overrides = hsconfig; };
   HUKBnix = import ../HUKB-generate/default.nix {
     inherit stdenv;
