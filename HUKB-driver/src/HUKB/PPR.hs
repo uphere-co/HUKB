@@ -21,6 +21,9 @@ import           Foreign.C.Types
 import           Foreign.Ptr                        (Ptr,castPtr)
 --
 import           WordNet.Type.POS
+import           STD.Deletable
+import           STD.CppString
+import           STD.Ostream
 --
 import           HUKB.Binding
 import           HUKB.Binding.Vector.Template

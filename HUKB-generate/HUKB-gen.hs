@@ -13,13 +13,13 @@ import FFICXX.Generate.Type.PackageInterface
 -- -------------------------------------------------------------------
 
 -- import from stdcxx
-stdcxx_cabal = cabal {- Cabal { cabal_pkgname = "stdcxx"
+stdcxx_cabal = Cabal { cabal_pkgname = "stdcxx"
                      , cabal_cheaderprefix = "STD"
                      , cabal_moduleprefix = "STD"
                      , cabal_additional_c_incs = []
                      , cabal_additional_c_srcs = []
                      , cabal_additional_pkgdeps = []
-                     } -}
+                     }
 
 -- import from stdcxx
 deletable :: Class
@@ -31,17 +31,17 @@ deletable =
 -- import from stdcxx
 string :: Class
 string =
-  Class stdcxx_cabal "string" [ deletable ] mempty  (Just "CppString")
-  [ Constructor [ cstring "p" ] Nothing
+  Class stdcxx_cabal "string" [ deletable ] mempty  (Just "CppString") []
+  {- [ Constructor [ cstring "p" ] Nothing
   , NonVirtual cstring_ "c_str" [] Nothing
   , NonVirtual (cppclassref_ string) "append" [cppclassref string "str"] Nothing
   , NonVirtual (cppclassref_ string) "erase" [] Nothing
-  ]
+  ] -}
 
 -- import from stdcxx
 ostream :: Class
 ostream =
-  Class cabal "ostream" [] mempty (Just "Ostream")
+  Class stdcxx_cabal "ostream" [] mempty (Just "Ostream")
   [
   ]
 
@@ -56,7 +56,7 @@ cabal = Cabal { cabal_pkgname = "HUKB"
               , cabal_moduleprefix = "HUKB.Binding"
               , cabal_additional_c_incs = []
               , cabal_additional_c_srcs = []
-              , cabal_additional_pkgdeps = [] -- [ CabalName "stdcxx" ]
+              , cabal_additional_pkgdeps = [ CabalName "stdcxx" ]
               }
 
 extraDep = []
@@ -121,8 +121,8 @@ csentenceConstIterator =
   ]
 -}
 
-classes = [ deletable, string,ostream  -- temporary
-          , kb,wdict_entries,wdict,csentence,cword
+classes = [ -- deletable, string,ostream  -- temporary
+            kb,wdict_entries,wdict,csentence,cword
 
           -- , csentenceConstIterator
           ]
@@ -150,7 +150,7 @@ headerMap = [ ("Kb"           , ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
             , ("WDict"        , ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
             , ("CSentence"    , ([NS "ukb", NS "std"], [HdrName "csentence.h"]))
             , ("CWord"        , ([NS "ukb", NS "std"], [HdrName "csentence.h", HdrName "string"]))
-            , ("string"       , ([NS "std"          ], [HdrName "string"   ]))
+            -- , ("string"       , ([NS "std"          ], [HdrName "string"   ]))
             ]
 
 main :: IO ()

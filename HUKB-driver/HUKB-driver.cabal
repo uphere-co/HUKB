@@ -37,6 +37,7 @@ Library
                        lens,
                        text,
                        HWordNet,
+                       stdcxx,
                        --
                        HUKB
 

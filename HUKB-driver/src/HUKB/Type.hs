@@ -10,6 +10,7 @@ import           Foreign.C.String
 import           WordNet.Type.POS
 --
 import           HUKB.Binding
+import           STD.CppString
 
 
 data UKBDB = UKBDB { _ukddb_bin :: CppString
