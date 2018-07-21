@@ -3,6 +3,7 @@ module Main where
 import Data.Monoid (mempty)
 --
 import FFICXX.Generate.Builder
+import FFICXX.Generate.Code.Primitive
 import FFICXX.Generate.Type.Class
 import FFICXX.Generate.Type.Module
 import FFICXX.Generate.Type.PackageInterface
@@ -45,6 +46,18 @@ ostream =
   [
   ]
 
+t_vector = TmplCls stdcxx_cabal "Vector" "std::vector" "t"
+             [
+             ]
+{-
+             [ TFunNew []
+             , TFun void_ "push_back" "push_back" [(TemplateParam "t","x")] Nothing
+             , TFun void_ "pop_back"  "pop_back"  []                        Nothing
+             , TFun (TemplateParam "t") "at" "at" [int "n"]                 Nothing
+             , TFun int_  "size"      "size"      []                        Nothing
+             , TFunDelete
+             ]
+-}
 
 -- -------------------------------------------------------------------
 -- HUKB definition
@@ -132,18 +145,14 @@ toplevelfunctions =
   , TopLevelFunction bool_ "disamb_csentence_kb" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing
   ]
 
-t_vector = TmplCls cabal "Vector" "std::vector" "t"
-             [ TFunNew []
-             , TFun void_ "push_back" "push_back" [(TemplateParam "t","x")] Nothing
-             , TFun void_ "pop_back"  "pop_back"  []                        Nothing
-             , TFun (TemplateParam "t") "at" "at" [int "n"]                 Nothing
-             , TFun int_  "size"      "size"      []                        Nothing
-             , TFunDelete
-             ]
+{-
 
 
 
 templates = [ (t_vector, HdrName "Vector.h") ]
+-}
+
+templates = [ ]
 
 headerMap = [ ("Kb"           , ([NS "ukb", NS "std"], [HdrName "kbGraph.h"]))
             , ("WDict_entries", ([NS "ukb", NS "std"], [HdrName "wdict.h"  ]))
