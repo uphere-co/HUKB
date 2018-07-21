@@ -26,8 +26,8 @@ import           STD.CppString
 import           STD.Ostream
 --
 import           HUKB.Binding
-import           HUKB.Binding.Vector.Template
-import qualified HUKB.Binding.Vector.TH       as TH
+import           STD.Vector.Template
+import qualified STD.Vector.TH       as TH
 --
 import           HUKB.Type
 
