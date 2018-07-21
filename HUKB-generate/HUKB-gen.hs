@@ -23,41 +23,23 @@ stdcxx_cabal = Cabal { cabal_pkgname = "stdcxx"
                      }
 
 -- import from stdcxx
+-- NOTE: inheritable class import needs method.
 deletable :: Class
 deletable =
   AbstractClass stdcxx_cabal "Deletable" [] mempty Nothing
-  [ Destructor Nothing
-  ]
+    [ Destructor Nothing
+    ]
 
 -- import from stdcxx
 string :: Class
 string =
-  Class stdcxx_cabal "string" [ deletable ] mempty  (Just "CppString") []
-  {- [ Constructor [ cstring "p" ] Nothing
-  , NonVirtual cstring_ "c_str" [] Nothing
-  , NonVirtual (cppclassref_ string) "append" [cppclassref string "str"] Nothing
-  , NonVirtual (cppclassref_ string) "erase" [] Nothing
-  ] -}
+  Class stdcxx_cabal "string" [ deletable ] mempty  (Just "CppString") [ ]
 
 -- import from stdcxx
 ostream :: Class
-ostream =
-  Class stdcxx_cabal "ostream" [] mempty (Just "Ostream")
-  [
-  ]
+ostream = Class stdcxx_cabal "ostream" [] mempty (Just "Ostream") [ ]
 
-t_vector = TmplCls stdcxx_cabal "Vector" "std::vector" "t"
-             [
-             ]
-{-
-             [ TFunNew []
-             , TFun void_ "push_back" "push_back" [(TemplateParam "t","x")] Nothing
-             , TFun void_ "pop_back"  "pop_back"  []                        Nothing
-             , TFun (TemplateParam "t") "at" "at" [int "n"]                 Nothing
-             , TFun int_  "size"      "size"      []                        Nothing
-             , TFunDelete
-             ]
--}
+t_vector = TmplCls stdcxx_cabal "Vector" "std::vector" "t" [ ] 
 
 -- -------------------------------------------------------------------
 -- HUKB definition
@@ -134,9 +116,7 @@ csentenceConstIterator =
   ]
 -}
 
-classes = [ -- deletable, string,ostream  -- temporary
-            kb,wdict_entries,wdict,csentence,cword
-
+classes = [ kb,wdict_entries,wdict,csentence,cword
           -- , csentenceConstIterator
           ]
 
@@ -145,12 +125,12 @@ toplevelfunctions =
   , TopLevelFunction bool_ "disamb_csentence_kb" [cppclassref csentence "cs", (vectorfloatref_, "ranks") ] Nothing
   ]
 
-{-
 
 
 
-templates = [ (t_vector, HdrName "Vector.h") ]
--}
+
+-- templates = [ (t_vector, HdrName "Vector.h") ]
+
 
 templates = [ ]
 
