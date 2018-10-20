@@ -1,7 +1,7 @@
 { pkgs ? import <nixpkgs> {}
 , fficxxSrc ? builtins.fetchGit {
                 url = "https://github.com/wavewave/fficxx";
-                rev = "020871332cbefd135ce7380a04fbdc93e3f8254b";
+                rev = "f6b00a53d03de024dbd1d18bdd94bb647ccbf465";
                 ref = "master";
               }
 }:

@@ -32,8 +32,8 @@ import qualified STD.Vector.TH       as TH
 import           HUKB.Type
 
 
-$(TH.genVectorInstanceFor ''CFloat "float")
-$(TH.genVectorInstanceFor ''CWord "CWord")
+$(TH.genVectorInstanceFor [t|CFloat|] "float")
+$(TH.genVectorInstanceFor [t|CWord|] "CWord")
 
 foreign import ccall "set_global" c_set_global :: CString -> IO ()
 
@@ -57,7 +57,7 @@ createUKBDB (binfile,dictfile) =
   withCString binfile $ \cstr_bin -> do
     withCString dictfile $ \cstr_dict -> do
       str_bin <- newCppString cstr_bin
-      kbcreate_from_binfile str_bin
+      kb_create_from_binfile str_bin
       c_set_global cstr_dict
 
 --
@@ -75,28 +75,33 @@ ppr c = do
           bstr_ctxt = TE.encodeUtf8 ctxt
       B.useAsCString bstr_cid $ \cstr_cid -> do
         B.useAsCString bstr_ctxt $ \cstr_ctxt -> do
-          wDictinstance >>= \r -> wDictget_entries r str_kaka str_null
+          wDict_instance >>= \r -> wDict_get_entries r str_kaka str_null
           sent@(CSentence psent) <- newCSentence cstr_cid cstr_ctxt
           ranks <- newVector
           calculate_kb_ppr sent ranks
           disamb_csentence_kb sent ranks
           p_cout <- c_get_cout
           let cout = Ostream (castPtr p_cout)
-          -- cSentenceprint_csent sent cout
           pvw <- c_get_vec_cword_from_csentence (castPtr psent)
           let v = Vector (castPtr pvw) :: Vector CWord
           n <- size v
-          let gettext = fmap (TE.decodeUtf8With TE.lenientDecode) . B.packCString <=< cppStringc_str
+          let gettext = fmap (TE.decodeUtf8With TE.lenientDecode) . B.packCString
+                        <=< cppString_c_str
               getint  = fmap (fmap fst . rightMay . decimal) . gettext
-          sid <- (gettext <=< cSentenceid) sent
+          sid <- (gettext <=< cSentence_id) sent
 
           ws <- mapM (at v) [0..n-1]
-          quads <- fmap catMaybes . flip mapM ws $ \x -> do mi <- getint =<< cWordid x
-                                                            case mi of
-                                                              Nothing -> return Nothing
-                                                              Just i -> fmap Just (UKBRW i <$> (gettext =<< cWordwpos x)
-                                                                                           <*> (gettext =<< cWordsyn x 0)
-                                                                                           <*> (gettext =<< cWordword x))
+          quads <-
+            fmap catMaybes $
+              flip mapM ws $ \x -> do
+                mi <- getint =<< cWord_id x
+                case mi of
+                 Nothing -> return Nothing
+                 Just i -> fmap Just (
+                             UKBRW i <$> (gettext =<< cWord_wpos x)
+                                     <*> (gettext =<< cWord_syn x 0)
+                                     <*> (gettext =<< cWord_word x)
+                           )
           delete str_kaka
           delete str_null
           return (UKBResult sid quads)

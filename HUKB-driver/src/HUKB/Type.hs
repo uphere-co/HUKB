@@ -3,13 +3,11 @@
 module HUKB.Type where
 
 import           Control.Lens          (makeLenses)
-import           Data.ByteString.Char8 (ByteString)
 import           Data.Text             (Text)
 import           Foreign.C.String
 --
 import           WordNet.Type.POS
 --
-import           HUKB.Binding
 import           STD.CppString
 
 
